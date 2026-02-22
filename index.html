@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRID — Energy & Power Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#090d0f;--bg2:#0f1418;--bg3:#161c22;--bg4:#1d252e;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);
+  --text:#dde3ea;--muted:#5a6472;--muted2:#7a8694;
+  --accent:#e8a020;--green:#2ecc71;--red:#e74c3c;
+  --blue:#5b9bd5;--teal:#1abc9c;--purple:#9b59b6;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.5;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.013) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.013) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:200;background:rgba(9,13,15,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:24px;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--accent);letter-spacing:0.1em;flex-shrink:0;display:flex;align-items:baseline;gap:10px;}
+.logo-sub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.25em;color:var(--muted);font-weight:400;text-transform:uppercase;}
+
+.ticker-wrap{flex:1;overflow:hidden;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;bottom:0;width:32px;z-index:2;}
+.ticker-wrap::before{left:0;background:linear-gradient(90deg,rgba(9,13,15,0.95),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(-90deg,rgba(9,13,15,0.95),transparent);}
+.ticker-track{display:flex;animation:tickerScroll 70s linear infinite;width:max-content;}
+.ticker-track:hover{animation-play-state:paused;}
+@keyframes tickerScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%)}}
+.t-item{display:flex;align-items:center;gap:6px;padding:0 20px;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
+.t-name{color:var(--muted2);}
+.t-val{color:var(--text);font-weight:500;}
+.t-up{color:var(--green);}
+.t-dn{color:var(--red);}
+
+.header-right{display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.live-badge{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);letter-spacing:0.1em;}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livePulse 2s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(46,204,113,0.5);}50%{opacity:0.7;box-shadow:0 0 0 5px rgba(46,204,113,0);}}
+.htime{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.05em;}
+.data-age{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.04em;}
+
+/* LAYOUT */
+.page{display:grid;grid-template-columns:200px 1fr 1fr 280px;min-height:calc(100vh - 52px);position:relative;z-index:1;}
+
+/* SIDEBAR */
+.sidebar{border-right:1px solid var(--border);padding:18px 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+.sb-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);padding:0 16px;margin-bottom:4px;}
+.sb-item{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;cursor:pointer;border-left:2px solid transparent;transition:all 0.15s;font-size:12.5px;}
+.sb-item:hover{background:var(--bg2);color:var(--text);}
+.sb-item.active{border-left-color:var(--accent);background:rgba(232,160,32,0.05);color:var(--accent);}
+.sb-badge{font-family:'DM Mono',monospace;font-size:10px;padding:1px 5px;border-radius:2px;background:var(--bg3);color:var(--muted);}
+.sb-badge.g{background:rgba(46,204,113,0.1);color:var(--green);}
+.sb-badge.r{background:rgba(231,76,60,0.1);color:var(--red);}
+
+.sb-price-item{padding:7px 16px;border-bottom:1px solid var(--border);}
+.sb-price-row{display:flex;justify-content:space-between;align-items:baseline;}
+.sb-price-name{font-size:12px;font-weight:500;}
+.sb-price-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:1px;}
+.sb-price-val{font-family:'DM Mono',monospace;font-size:12px;}
+.sb-price-chg{font-family:'DM Mono',monospace;font-size:10px;}
+
+/* CENTER COLS */
+.center-col{border-right:1px solid var(--border);overflow-y:auto;height:calc(100vh - 52px);padding:20px 22px;display:flex;flex-direction:column;gap:24px;}
+.center-col2{overflow-y:auto;height:calc(100vh - 52px);padding:20px 22px;display:flex;flex-direction:column;gap:24px;}
+
+.sec-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:0.02em;}
+.sec-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.05em;}
+
+/* TOGGLES */
+.toggle-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.tog{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;letter-spacing:0.05em;transition:all 0.14s;}
+.tog:hover{color:var(--text);background:var(--bg3);}
+.tog.on{color:var(--accent);border-color:rgba(232,160,32,0.4);background:rgba(232,160,32,0.06);}
+.tog-sep{width:1px;background:var(--border2);margin:0 4px;}
+
+/* EQUITY TABLE */
+.equity-table{border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.eq-thead{display:grid;grid-template-columns:148px repeat(4,1fr);background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 14px;}
+.eq-th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.eq-th:not(:first-child){text-align:right;}
+.eq-row{display:grid;grid-template-columns:148px repeat(4,1fr);padding:9px 14px;border-bottom:1px solid var(--border);background:var(--bg2);transition:background 0.12s;cursor:pointer;align-items:center;}
+.eq-row:last-child{border-bottom:none;}
+.eq-row:hover{background:var(--bg3);}
+.eq-name{font-size:12.5px;font-weight:500;}
+.eq-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:1px;}
+.eq-cell{font-family:'DM Mono',monospace;font-size:12px;text-align:right;}
+.eq-cell.up{color:var(--green);}
+.eq-cell.dn{color:var(--red);}
+.eq-cell.na{color:var(--muted);}
+.spark{display:flex;align-items:flex-end;gap:1.5px;height:22px;justify-content:flex-end;}
+.spark-bar{width:4px;border-radius:1px 1px 0 0;background:rgba(255,255,255,0.12);}
+.spark-bar.up-bar{background:rgba(46,204,113,0.5);}
+.spark-bar.dn-bar{background:rgba(231,76,60,0.4);}
+
+/* CAPIQ SOURCE BADGE */
+.capiq-badge{font-family:'DM Mono',monospace;font-size:9px;padding:1px 5px;border-radius:2px;background:rgba(91,155,213,0.1);color:var(--blue);margin-left:6px;}
+
+/* GRID STATUS */
+.grid-status-panel{border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.grid-region{border-bottom:1px solid var(--border);}
+.grid-region:last-child{border-bottom:none;}
+.grid-region-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg2);cursor:pointer;transition:background 0.12s;}
+.grid-region-hdr:hover{background:var(--bg3);}
+.grid-region-name{font-size:12.5px;font-weight:500;}
+.grid-region-meta{display:flex;align-items:center;gap:12px;font-family:'DM Mono',monospace;font-size:11px;}
+.grid-balance{padding:2px 8px;border-radius:3px;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.05em;}
+.grid-balance.surplus{background:rgba(46,204,113,0.1);color:var(--green);}
+.grid-balance.tight{background:rgba(232,160,32,0.1);color:var(--accent);}
+.grid-balance.stress{background:rgba(231,76,60,0.1);color:var(--red);}
+.grid-detail{display:none;padding:12px 16px;background:var(--bg);display:none;grid-template-columns:1fr 1fr;gap:12px;}
+.grid-detail.show{display:grid;}
+.grid-demand-bar-wrap{grid-column:1/-1;}
+.grid-bar-label{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:5px;}
+.grid-bar-bg{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;position:relative;}
+.grid-bar-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.grid-bar-peak{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--accent);opacity:0.6;}
+.grid-stat-label{color:var(--muted);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;}
+.grid-stat-val{font-size:13px;font-weight:500;}
+.demand-drivers{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.driver-tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:3px;display:flex;align-items:center;gap:4px;}
+.driver-tag.demand-up{background:rgba(231,76,60,0.1);color:var(--red);}
+.driver-tag.demand-dn{background:rgba(46,204,113,0.1);color:var(--green);}
+.driver-tag.neutral{background:var(--bg3);color:var(--muted2);}
+
+/* FEEDS */
+.feed{border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+.feed-item{display:grid;grid-template-columns:80px 26px 1fr auto;gap:10px;align-items:start;padding:13px 16px;border-bottom:1px solid var(--border);background:var(--bg2);transition:background 0.12s;cursor:pointer;}
+.feed-item:last-child{border-bottom:none;}
+.feed-item:hover{background:var(--bg3);}
+.fi-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding-top:2px;line-height:1.6;}
+.fi-icon{width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.fi-icon.pol{background:rgba(91,155,213,0.12);}
+.fi-icon.mkt{background:rgba(232,160,32,0.12);}
+.fi-icon.inf{background:rgba(155,89,182,0.12);}
+.fi-icon.alr{background:rgba(231,76,60,0.12);}
+.fi-icon.deal{background:rgba(46,204,113,0.12);}
+.fi-icon.com{background:rgba(26,188,156,0.12);}
+.fi-head{font-size:12.5px;line-height:1.45;margin-bottom:5px;font-weight:500;}
+.fi-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.tag{font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:2px;letter-spacing:0.03em;}
+.tag.geo{background:rgba(91,155,213,0.1);color:var(--blue);}
+.tag.sec{background:rgba(232,160,32,0.1);color:var(--accent);}
+.tag.co{background:rgba(155,89,182,0.1);color:var(--purple);}
+.tag.pol{background:rgba(46,204,113,0.1);color:var(--green);}
+.fi-imp{font-family:'DM Mono',monospace;font-size:9px;padding:3px 7px;border-radius:2px;align-self:start;white-space:nowrap;}
+.fi-imp.h{background:rgba(231,76,60,0.1);color:var(--red);}
+.fi-imp.m{background:rgba(232,160,32,0.1);color:var(--accent);}
+.fi-imp.l{background:rgba(107,114,128,0.1);color:var(--muted2);}
+.speaker-badge{font-size:11px;font-weight:500;margin-bottom:3px;display:flex;align-items:center;gap:6px;}
+.speaker-role{font-family:'DM Mono',monospace;font-size:9px;color:var(--teal);padding:1px 5px;border-radius:2px;background:rgba(26,188,156,0.1);}
+
+/* FILTER */
+.filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.fil{font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--muted2);cursor:pointer;letter-spacing:0.04em;transition:all 0.13s;}
+.fil:hover{color:var(--text);background:var(--bg3);}
+.fil.on{color:var(--accent);border-color:rgba(232,160,32,0.4);background:rgba(232,160,32,0.06);}
+
+/* RIGHT PANEL */
+.right-panel{border-left:1px solid var(--border);padding:18px 16px;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+.rp-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.alert-card{padding:9px 11px;border-radius:5px;border-left:2px solid;background:var(--bg2);margin-bottom:7px;font-size:12px;line-height:1.45;}
+.alert-card.crit{border-color:var(--red);}
+.alert-card.warn{border-color:var(--accent);}
+.alert-card.info{border-color:var(--blue);}
+.alert-time{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;}
+.cap-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.cap-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:62px;flex-shrink:0;}
+.cap-bg{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.cap-fill{height:100%;border-radius:2px;}
+.cap-val{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-align:right;min-width:46px;}
+.upcoming-item{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.upcoming-item:last-child{border-bottom:none;}
+.up-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);min-width:38px;margin-top:2px;}
+
+/* loading state */
+.loading{padding:20px;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.1em;}
+.error-msg{padding:12px 16px;font-family:'DM Mono',monospace;font-size:11px;color:var(--red);background:rgba(231,76,60,0.05);border-left:2px solid var(--red);border-radius:4px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.feed-item{animation:fadeUp 0.3s ease both;}
+.feed-item:nth-child(1){animation-delay:.05s;}
+.feed-item:nth-child(2){animation-delay:.10s;}
+.feed-item:nth-child(3){animation-delay:.15s;}
+.feed-item:nth-child(4){animation-delay:.20s;}
+.feed-item:nth-child(5){animation-delay:.25s;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">GRID <span class="logo-sub">Energy & Power</span></div>
+  <div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"><div class="loading">Loading prices...</div></div></div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div class="data-age" id="dataAge">Fetching data...</div>
+    <div class="htime" id="clock"></div>
+  </div>
+</header>
+
+<div class="page">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div>
+    <div class="sb-label">Region</div>
+    <div class="sb-item active" onclick="setSbActive(this)">Global <span class="sb-badge">247</span></div>
+    <div class="sb-item" onclick="setSbActive(this)">North America <span class="sb-badge">89</span></div>
+    <div class="sb-item" onclick="setSbActive(this)">Europe <span class="sb-badge">76</span></div>
+    <div class="sb-item" onclick="setSbActive(this)">Asia-Pacific <span class="sb-badge">54</span></div>
+    <div class="sb-item" onclick="setSbActive(this)">Middle East <span class="sb-badge">28</span></div>
+  </div>
+  <div>
+    <div class="sb-label">Commodity Prices</div>
+    <div id="sidebarPrices"><div class="loading">Loading...</div></div>
+  </div>
+</aside>
+
+<!-- CENTER COL 1 -->
+<div class="center-col">
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-title">Equity Performance</div>
+      <div class="sec-meta" id="equityMeta">Loading...</div>
+    </div>
+    <div class="toggle-row">
+      <button class="tog on" onclick="setMetric(this,'price')">Share Price %</button>
+      <button class="tog" onclick="setMetric(this,'eps')">EPS Revisions</button>
+      <button class="tog" onclick="setMetric(this,'pe')">Fwd P/E Δ</button>
+      <button class="tog" onclick="setMetric(this,'ev')">EV/EBITDA Δ</button>
+      <div class="tog-sep"></div>
+      <button class="tog on" onclick="setPeriod(this,'ytd')">YTD</button>
+      <button class="tog" onclick="setPeriod(this,'1y')">1Y</button>
+      <button class="tog" onclick="setPeriod(this,'3y')">3Y</button>
+    </div>
+    <div class="equity-table" id="equityTable">
+      <div class="eq-thead">
+        <div class="eq-th">Subsector</div>
+        <div class="eq-th" id="col1h" style="text-align:right">Perf.</div>
+        <div class="eq-th" style="text-align:right">Mkt Cap</div>
+        <div class="eq-th" id="col3h" style="text-align:right">P/E</div>
+        <div class="eq-th" style="text-align:right">Trend</div>
+      </div>
+      <div class="loading">Loading equity data...</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-title">Grid Status</div>
+      <div class="sec-meta">Real-time · All regions</div>
+    </div>
+    <div class="grid-status-panel" id="gridPanel"><div class="loading">Loading grid data...</div></div>
+  </div>
+</div>
+
+<!-- CENTER COL 2 -->
+<div class="center-col2">
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-title">Signal Feed</div>
+      <div class="sec-meta">News & Events</div>
+    </div>
+    <div class="filter-row">
+      <button class="fil on" onclick="filterFeed(this,'all','signals')">All</button>
+      <button class="fil" onclick="filterFeed(this,'pol','signals')">Policy</button>
+      <button class="fil" onclick="filterFeed(this,'mkt','signals')">Markets</button>
+      <button class="fil" onclick="filterFeed(this,'inf','signals')">Infrastructure</button>
+      <button class="fil" onclick="filterFeed(this,'deal','signals')">M&A</button>
+      <button class="fil" onclick="filterFeed(this,'alr','signals')">Alerts</button>
+    </div>
+    <div class="feed" id="signalFeed"><div class="loading">Loading signals...</div></div>
+  </div>
+
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-title">Official Commentary</div>
+      <div class="sec-meta">Gov · Regulators · Operators</div>
+    </div>
+    <div class="filter-row">
+      <button class="fil on" onclick="filterFeed(this,'all','commentary')">All</button>
+      <button class="fil" onclick="filterFeed(this,'ferc','commentary')">FERC</button>
+      <button class="fil" onclick="filterFeed(this,'pjm','commentary')">PJM</button>
+      <button class="fil" onclick="filterFeed(this,'gov','commentary')">Government</button>
+      <button class="fil" onclick="filterFeed(this,'iea','commentary')">IEA/IRENA</button>
+    </div>
+    <div class="feed" id="commentaryFeed"><div class="loading">Loading commentary...</div></div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<aside class="right-panel">
+  <div>
+    <div class="rp-title">Active Grid Alerts</div>
+    <div id="alertsPanel">
+      <div class="alert-card crit">
+        <div>ERCOT conservation appeal — demand approaching 75 GW. Winter storm driving residential heating surge.</div>
+        <div class="alert-time">14:18 UTC · Texas / ERCOT</div>
+      </div>
+      <div class="alert-card warn">
+        <div>France nuclear output at 42 GW (-8 GW vs avg). Grid imports elevated from Spain +4.2 GW.</div>
+        <div class="alert-time">09:30 UTC · RTE France</div>
+      </div>
+      <div class="alert-card info">
+        <div>Germany wind output 28 GW — above seasonal avg. Day-ahead prices negative in 3 hours.</div>
+        <div class="alert-time">08:00 UTC · 50Hertz/Tennet</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="rp-title">Global Capacity Mix (Installed GW)</div>
+    <div class="cap-row"><div class="cap-label">Solar</div><div class="cap-bg"><div class="cap-fill" style="width:72%;background:linear-gradient(90deg,#e8a020,#f0c040);"></div></div><div class="cap-val">2,340 GW</div></div>
+    <div class="cap-row"><div class="cap-label">Wind</div><div class="cap-bg"><div class="cap-fill" style="width:54%;background:linear-gradient(90deg,#5b9bd5,#93c5fd);"></div></div><div class="cap-val">1,760 GW</div></div>
+    <div class="cap-row"><div class="cap-label">Hydro</div><div class="cap-bg"><div class="cap-fill" style="width:41%;background:linear-gradient(90deg,#1abc9c,#67e8f9);"></div></div><div class="cap-val">1,330 GW</div></div>
+    <div class="cap-row"><div class="cap-label">Gas</div><div class="cap-bg"><div class="cap-fill" style="width:38%;background:linear-gradient(90deg,#9b59b6,#c4b5fd);"></div></div><div class="cap-val">1,240 GW</div></div>
+    <div class="cap-row"><div class="cap-label">Coal</div><div class="cap-bg"><div class="cap-fill" style="width:30%;background:linear-gradient(90deg,#5a6472,#9ca3af);"></div></div><div class="cap-val">980 GW</div></div>
+    <div class="cap-row"><div class="cap-label">Nuclear</div><div class="cap-bg"><div class="cap-fill" style="width:13%;background:linear-gradient(90deg,#2ecc71,#4ade80);"></div></div><div class="cap-val">410 GW</div></div>
+    <div class="cap-row"><div class="cap-label">Storage</div><div class="cap-bg"><div class="cap-fill" style="width:5%;background:linear-gradient(90deg,#e74c3c,#f97316);"></div></div><div class="cap-val">180 GW</div></div>
+  </div>
+
+  <div>
+    <div class="rp-title">Upcoming Events</div>
+    <div class="upcoming-item"><div class="up-date">Feb 24</div><div>IEA Oil Market Report — February edition</div></div>
+    <div class="upcoming-item"><div class="up-date">Feb 26</div><div>FERC Open Meeting — interconnection queue reform vote</div></div>
+    <div class="upcoming-item"><div class="up-date">Mar 1</div><div>EIA Weekly Petroleum Status Report</div></div>
+    <div class="upcoming-item"><div class="up-date">Mar 4</div><div>EU Council: Hydrogen Bank pilot auction results</div></div>
+    <div class="upcoming-item"><div class="up-date">Mar 6</div><div>OPEC+ Ministerial Monitoring Committee — Vienna</div></div>
+    <div class="upcoming-item"><div class="up-date">Mar 12</div><div>UK Spring Statement — energy windfall tax review</div></div>
+    <div class="upcoming-item"><div class="up-date">Mar 18</div><div>CERAWeek by S&P Global — Houston, TX</div></div>
+  </div>
+</aside>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIG
+// Point DATA_URL at your GitHub raw file once repo is live.
+// Format: https://raw.githubusercontent.com/USERNAME/REPO/main/data/live.json
+// ══════════════════════════════════════════════════════
+const DATA_URL = "data/live.json";  // local fallback; replace with GitHub raw URL after deploy
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let liveData   = null;
+let activeMetric = "price";
+let activePeriod = "ytd";
+let signalFilter    = "all";
+let commentaryFilter = "all";
+
+// ══════════════════════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════════════════════
+function updateClock(){
+  const now = new Date();
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = now.toISOString().slice(0,10).split('-');
+  const t = now.toISOString().slice(11,16);
+  document.getElementById('clock').textContent = `${d[2]} ${months[parseInt(d[1])-1]} ${d[0]} · ${t} UTC`;
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+// ══════════════════════════════════════════════════════
+// DATA FETCH
+// ══════════════════════════════════════════════════════
+async function loadData(){
+  try {
+    const res = await fetch(DATA_URL + "?t=" + Date.now());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    liveData = await res.json();
+    document.getElementById('dataAge').textContent = `Updated: ${liveData.last_updated || 'Unknown'}`;
+    renderAll();
+  } catch(e) {
+    console.warn("Could not load live.json, using fallback data:", e.message);
+    document.getElementById('dataAge').textContent = "⚠ Live data unavailable — showing placeholders";
+    liveData = getFallbackData();
+    renderAll();
+  }
+}
+
+// Refresh every 5 minutes
+setInterval(loadData, 5 * 60 * 1000);
+loadData();
+
+function renderAll(){
+  renderTicker();
+  renderSidebarPrices();
+  renderEquity();
+  renderGrid();
+  renderSignals();
+  renderCommentary();
+}
+
+// ══════════════════════════════════════════════════════
+// TICKER
+// ══════════════════════════════════════════════════════
+function renderTicker(){
+  const prices = liveData?.prices || [];
+  if(!prices.length) return;
+  const track = document.getElementById('tickerTrack');
+  let html = '';
+  for(let i=0;i<2;i++){
+    prices.forEach(p=>{
+      html += `<div class="t-item">
+        <span class="t-name">${p.name.toUpperCase()}</span>
+        <span class="t-val">${p.value}</span>
+        <span class="${p.up?'t-up':'t-dn'}">${p.up?'▲':'▼'} ${Math.abs(p.change_pct)}%</span>
+      </div>`;
+    });
+  }
+  track.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════
+// SIDEBAR PRICES
+// ══════════════════════════════════════════════════════
+function renderSidebarPrices(){
+  const prices = liveData?.prices || [];
+  const el = document.getElementById('sidebarPrices');
+  if(!prices.length){ el.innerHTML = '<div class="loading">No price data</div>'; return; }
+  el.innerHTML = prices.map(p=>`
+    <div class="sb-price-item">
+      <div class="sb-price-row">
+        <span class="sb-price-name">${p.name}</span>
+        <span class="sb-price-val">${p.value}</span>
+      </div>
+      <div class="sb-price-row">
+        <span class="sb-price-sub">${p.unit}</span>
+        <span class="sb-price-chg ${p.up?'t-up':'t-dn'}">${p.up?'▲':'▼'} ${Math.abs(p.change_pct)}%</span>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// EQUITY TABLE
+// ══════════════════════════════════════════════════════
+const COL_LABELS = {price:'Perf.',eps:'EPS Rev.',pe:'Fwd P/E Δ',ev:'EV/EBITDA Δ'};
+const COL3_LABELS = {price:'Fwd P/E',eps:'Fwd P/E',pe:'vs Avg',ev:'vs Avg'};
+const PERIOD_LABELS = {ytd:'YTD',y1:'1Y',y3:'3Y'};
+
+function renderEquity(){
+  const data = liveData?.equity || [];
+  const table = document.getElementById('equityTable');
+  const thead = table.querySelector('.eq-thead') || buildThead(table);
+
+  document.getElementById('col1h').textContent = COL_LABELS[activeMetric];
+  document.getElementById('col3h').textContent = COL3_LABELS[activeMetric];
+  document.getElementById('equityMeta').textContent =
+    PERIOD_LABELS[activePeriod] + ' · ' +
+    {price:'Share Price %',eps:'EPS Estimate Revisions',pe:'Forward P/E Change',ev:'EV/EBITDA Change'}[activeMetric] +
+    (data[0]?.source === 'capiq' ? ' · Cap IQ' : ' · Placeholder');
+
+  // Remove old rows
+  [...table.querySelectorAll('.eq-row')].forEach(r=>r.remove());
+
+  if(!data.length){
+    table.insertAdjacentHTML('beforeend','<div class="loading">No equity data</div>');
+    return;
+  }
+
+  data.forEach(s=>{
+    const d = s.data?.[activeMetric];
+    const val = d?.[activePeriod] || 'N/A';
+    const isUp = val.startsWith('+');
+    const isDn = val.startsWith('-');
+    const mx = Math.max(...(s.spark||[50]));
+    const sparkHTML = (s.spark||[50,50,50,50,50,50,50]).map((v,i,arr)=>{
+      const h = Math.round((v/mx)*100);
+      const cls = i===arr.length-1?(isUp?'up-bar':'dn-bar'):'';
+      return `<div class="spark-bar ${cls}" style="height:${Math.max(h,8)}%"></div>`;
+    }).join('');
+    const capiqBadge = s.source==='capiq' ? '<span class="capiq-badge">CIQ</span>' : '';
+    table.insertAdjacentHTML('beforeend',`
+      <div class="eq-row">
+        <div><div class="eq-name">${s.name}${capiqBadge}</div><div class="eq-sub">${s.sub||''}</div></div>
+        <div class="eq-cell ${isUp?'up':isDn?'dn':'na'}">${val}</div>
+        <div class="eq-cell">${s.mktcap||'N/A'}</div>
+        <div class="eq-cell">${s.pe||'N/A'}</div>
+        <div class="eq-cell"><div class="spark">${sparkHTML}</div></div>
+      </div>`);
+  });
+}
+
+function buildThead(table){
+  table.innerHTML = `<div class="eq-thead">
+    <div class="eq-th">Subsector</div>
+    <div class="eq-th" id="col1h" style="text-align:right">Perf.</div>
+    <div class="eq-th" style="text-align:right">Mkt Cap</div>
+    <div class="eq-th" id="col3h" style="text-align:right">P/E</div>
+    <div class="eq-th" style="text-align:right">Trend</div>
+  </div>`;
+  return table.querySelector('.eq-thead');
+}
+
+// ══════════════════════════════════════════════════════
+// GRID STATUS
+// ══════════════════════════════════════════════════════
+function renderGrid(){
+  const regions = liveData?.grid || [];
+  const panel = document.getElementById('gridPanel');
+  if(!regions.length){ panel.innerHTML='<div class="loading">No grid data</div>'; return; }
+
+  panel.innerHTML = regions.map((r,i)=>{
+    const pct = r.peak>0 ? Math.round((r.demand/r.peak)*100) : 0;
+    const barColor = r.status==='stress'?'#e74c3c':r.status==='tight'?'#e8a020':'#2ecc71';
+    const sourcesHTML = Object.entries(r.sources||{}).map(([k,v])=>
+      `<span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin-right:10px;">${k} <strong style="color:var(--text)">${v}</strong></span>`
+    ).join('');
+    const driversHTML = (r.drivers||[]).map(d=>
+      `<div class="driver-tag ${d.type}">${d.type==='demand-up'?'▲':d.type==='demand-dn'?'▼':'◆'} ${d.label}</div>`
+    ).join('');
+    const margin = r.supply - r.demand;
+    const marginColor = margin>5?'var(--green)':margin>0?'var(--accent)':'var(--red)';
+    return `<div class="grid-region">
+      <div class="grid-region-hdr" onclick="toggleGrid(${i})">
+        <div class="grid-region-name">${r.name}${r.note?` <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">*</span>`:''}</div>
+        <div class="grid-region-meta">
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);">${r.demand} / ${r.peak} GW</span>
+          <span class="grid-balance ${r.status}">${r.status.toUpperCase()}</span>
+          <span style="color:var(--muted);font-size:11px;" id="garrow-${i}">${i===0?'▼':'▶'}</span>
+        </div>
+      </div>
+      <div class="grid-detail${i===0?' show':''}" id="gd-${i}">
+        <div class="grid-demand-bar-wrap">
+          <div class="grid-bar-label">
+            <span>Demand: <strong style="color:var(--text)">${r.demand} GW</strong> (${pct}% of peak)</span>
+            <span style="color:var(--accent)">Peak: ${r.peak} GW</span>
+          </div>
+          <div class="grid-bar-bg">
+            <div class="grid-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${barColor}88,${barColor});"></div>
+            <div class="grid-bar-peak" style="left:85%"></div>
+          </div>
+        </div>
+        <div><div class="grid-stat-label">Supply Available</div><div class="grid-stat-val">${r.supply} GW</div></div>
+        <div><div class="grid-stat-label">Supply Margin</div><div class="grid-stat-val" style="color:${marginColor}">+${margin.toFixed(1)} GW</div></div>
+        <div style="grid-column:1/-1;"><div class="grid-stat-label" style="margin-bottom:5px;">Generation Mix</div><div>${sourcesHTML||'N/A'}</div></div>
+        ${driversHTML?`<div class="demand-drivers"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;width:100%;margin-bottom:2px;">Demand Drivers</div>${driversHTML}</div>`:''}
+        ${r.note?`<div style="grid-column:1/-1;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;">* ${r.note}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleGrid(i){
+  const el = document.getElementById(`gd-${i}`);
+  const arrow = document.getElementById(`garrow-${i}`);
+  const open = el.classList.toggle('show');
+  arrow.textContent = open ? '▼' : '▶';
+}
+
+// ══════════════════════════════════════════════════════
+// FEEDS
+// ══════════════════════════════════════════════════════
+function renderSignals(){
+  const items = liveData?.signals || [];
+  renderFeed(items, 'signalFeed', signalFilter, false);
+}
+
+function renderCommentary(){
+  const items = liveData?.commentary || [];
+  renderFeed(items, 'commentaryFeed', commentaryFilter, true);
+}
+
+function renderFeed(events, containerId, filter, isCommentary){
+  const container = document.getElementById(containerId);
+  const filtered = filter==='all' ? events : events.filter(e=>e.type===filter);
+  if(!filtered.length){
+    container.innerHTML = `<div class="loading">No items match this filter.</div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(e=>{
+    const tagsHTML = (e.tags||[]).map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('');
+    if(isCommentary){
+      return `<div class="feed-item">
+        <div class="fi-time">${(e.time||'').replace('\n','<br>')}</div>
+        <div class="fi-icon com">${e.iconLabel||'🏛️'}</div>
+        <div class="fi-body">
+          <div class="speaker-badge">${e.speaker||''} <span class="speaker-role">${e.role||''}</span></div>
+          <div class="fi-head" style="font-size:12px;opacity:0.9;">${e.head||''}</div>
+          <div class="fi-tags" style="margin-top:5px;">${tagsHTML}</div>
+        </div>
+        <div></div>
+      </div>`;
+    } else {
+      const impLabel = e.imp==='h'?'HIGH':e.imp==='m'?'MED':'LOW';
+      return `<div class="feed-item">
+        <div class="fi-time">${(e.time||'').replace('\n','<br>')}</div>
+        <div class="fi-icon ${e.icon||'mkt'}">${e.iconLabel||'📰'}</div>
+        <div class="fi-body">
+          <div class="fi-head">${e.head||''}</div>
+          <div class="fi-tags">${tagsHTML}</div>
+        </div>
+        <div class="fi-imp ${e.imp||'l'}">${impLabel}</div>
+      </div>`;
+    }
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// TOGGLE HANDLERS
+// ══════════════════════════════════════════════════════
+function setMetric(btn, key){
+  activeMetric = key;
+  btn.closest('.toggle-row').querySelectorAll('.tog').forEach(b=>{
+    if(['price','eps','pe','ev'].includes(b.textContent.toLowerCase().replace(/ /g,'').replace('%','').replace('Δ','').replace('fwd','').replace('eps','eps').replace('ev/ebitda','ev'))){
+      // reset metric buttons
+    }
+  });
+  // simpler: just track by the four metric buttons
+  document.querySelectorAll('.toggle-row .tog').forEach(b=>{
+    const txt = b.getAttribute('onclick')||'';
+    if(txt.includes('setMetric')) b.classList.remove('on');
+  });
+  btn.classList.add('on');
+  renderEquity();
+}
+
+function setPeriod(btn, key){
+  activePeriod = key;
+  document.querySelectorAll('.toggle-row .tog').forEach(b=>{
+    const txt = b.getAttribute('onclick')||'';
+    if(txt.includes('setPeriod')) b.classList.remove('on');
+  });
+  btn.classList.add('on');
+  renderEquity();
+}
+
+function filterFeed(btn, filter, feedName){
+  btn.closest('.filter-row').querySelectorAll('.fil').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(feedName==='signals'){ signalFilter=filter; renderSignals(); }
+  else { commentaryFilter=filter; renderCommentary(); }
+}
+
+function setSbActive(el){
+  el.closest('div').querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// FALLBACK DATA (shown if live.json not yet available)
+// ══════════════════════════════════════════════════════
+function getFallbackData(){
+  return {
+    last_updated: "Placeholder data — deploy backend to get live data",
+    prices: [
+      {name:"Brent Crude",value:"$79.34",unit:"USD/bbl",change_pct:-0.3,up:false},
+      {name:"WTI",value:"$75.10",unit:"USD/bbl",change_pct:-0.5,up:false},
+      {name:"Henry Hub",value:"$3.18",unit:"USD/MMBtu",change_pct:1.4,up:true},
+      {name:"TTF Gas",value:"€31.42",unit:"EUR/MWh",change_pct:-0.8,up:false},
+      {name:"EU ETS Carbon",value:"€58.80",unit:"EUR/t CO₂",change_pct:3.2,up:true},
+      {name:"UK Power",value:"£74.10",unit:"GBP/MWh",change_pct:2.1,up:true},
+      {name:"ERCOT Day-Ahead",value:"$42.10",unit:"USD/MWh",change_pct:-1.1,up:false},
+      {name:"JKM LNG",value:"$13.85",unit:"USD/MMBtu",change_pct:0.7,up:true},
+      {name:"Uranium",value:"$87.50",unit:"USD/lb",change_pct:0.2,up:true},
+    ],
+    grid: [
+      {name:"ERCOT (Texas)",demand:73.8,peak:76.2,supply:76.1,status:"tight",sources:{Gas:"38%",Wind:"24%",Nuclear:"12%",Solar:"14%",Coal:"8%"},drivers:[{label:"Winter storm",type:"demand-up"},{label:"Heating demand +18%",type:"demand-up"},{label:"Wind below avg",type:"neutral"}]},
+      {name:"PJM (NE US)",demand:142.4,peak:168.2,supply:155.2,status:"surplus",sources:{Gas:"42%",Nuclear:"35%",Coal:"10%",Hydro:"6%",Renewables:"7%"},drivers:[{label:"Mild temps",type:"demand-dn"},{label:"Nuclear at 98%",type:"demand-dn"}]},
+      {name:"GB Grid",demand:38.2,peak:52.4,supply:41.8,status:"surplus",sources:{Wind:"38%",Gas:"28%",Nuclear:"14%",Imports:"12%",Hydro:"8%"},drivers:[{label:"High wind output",type:"demand-dn"},{label:"Mild temps",type:"demand-dn"}]},
+      {name:"ENTSO-E (Central EU)",demand:284.6,peak:320.0,supply:298.4,status:"surplus",sources:{Gas:"28%",Nuclear:"22%",Wind:"18%",Coal:"14%",Hydro:"12%",Solar:"6%"},drivers:[{label:"French nuclear -8GW",type:"demand-up"},{label:"DE wind surplus",type:"demand-dn"}]},
+    ],
+    equity: [
+      {name:"Oil E&P",sub:"Upstream · GICS 10102010",mktcap:"$1.84T",pe:"8.2x",data:{price:{ytd:"-4.2%",y1:"+11.3%",y3:"+38.7%"},eps:{ytd:"-2.1%",y1:"+3.4%",y3:"+18.2%"},pe:{ytd:"-0.8x",y1:"+1.2x",y3:"+3.4x"},ev:{ytd:"-0.4x",y1:"+0.9x",y3:"+2.1x"}},spark:[30,45,38,52,40,35,28]},
+      {name:"Midstream",sub:"Pipelines/MLPs",mktcap:"$620B",pe:"14.8x",data:{price:{ytd:"+2.1%",y1:"+9.4%",y3:"+24.3%"},eps:{ytd:"+1.4%",y1:"+5.2%",y3:"+12.8%"},pe:{ytd:"+0.3x",y1:"+1.8x",y3:"+2.6x"},ev:{ytd:"+0.2x",y1:"+1.1x",y3:"+1.9x"}},spark:[45,48,50,52,49,51,53]},
+      {name:"LNG",sub:"Export/Import",mktcap:"$340B",pe:"11.4x",data:{price:{ytd:"+1.3%",y1:"+14.2%",y3:"+52.1%"},eps:{ytd:"+4.8%",y1:"+12.3%",y3:"+34.5%"},pe:{ytd:"-0.2x",y1:"+0.8x",y3:"+4.2x"},ev:{ytd:"+0.1x",y1:"+1.3x",y3:"+3.8x"}},spark:[40,42,48,55,52,58,61]},
+      {name:"Refiners",sub:"Downstream",mktcap:"$280B",pe:"6.9x",data:{price:{ytd:"-6.8%",y1:"-3.2%",y3:"+12.4%"},eps:{ytd:"-11.2%",y1:"-8.4%",y3:"+4.3%"},pe:{ytd:"-1.2x",y1:"-0.8x",y3:"+1.2x"},ev:{ytd:"-0.6x",y1:"-0.4x",y3:"+0.8x"}},spark:[60,55,48,42,38,32,28]},
+      {name:"Oil Services",sub:"Field Services",mktcap:"$520B",pe:"13.1x",data:{price:{ytd:"-3.4%",y1:"+6.8%",y3:"+44.2%"},eps:{ytd:"+2.1%",y1:"+8.4%",y3:"+22.6%"},pe:{ytd:"-0.4x",y1:"+1.4x",y3:"+3.8x"},ev:{ytd:"-0.2x",y1:"+1.0x",y3:"+2.4x"}},spark:[50,48,52,55,50,48,46]},
+      {name:"Utilities",sub:"Electric",mktcap:"$1.12T",pe:"16.4x",data:{price:{ytd:"+3.8%",y1:"+12.4%",y3:"+18.2%"},eps:{ytd:"+2.8%",y1:"+6.4%",y3:"+14.3%"},pe:{ytd:"+0.6x",y1:"+2.1x",y3:"+1.8x"},ev:{ytd:"+0.4x",y1:"+1.4x",y3:"+1.2x"}},spark:[40,42,45,48,52,55,58]},
+      {name:"Renewables",sub:"Solar/Wind Dev",mktcap:"$890B",pe:"22.8x",data:{price:{ytd:"+8.4%",y1:"+24.8%",y3:"+62.4%"},eps:{ytd:"+12.3%",y1:"+28.4%",y3:"+84.2%"},pe:{ytd:"+1.8x",y1:"+4.2x",y3:"+8.6x"},ev:{ytd:"+1.2x",y1:"+3.1x",y3:"+6.4x"}},spark:[20,28,35,42,52,62,74]},
+      {name:"Nuclear",sub:"Operators/Fuel",mktcap:"$210B",pe:"18.2x",data:{price:{ytd:"+6.2%",y1:"+38.4%",y3:"+142.8%"},eps:{ytd:"+8.4%",y1:"+22.6%",y3:"+68.4%"},pe:{ytd:"+1.4x",y1:"+5.8x",y3:"+12.4x"},ev:{ytd:"+0.8x",y1:"+3.4x",y3:"+8.2x"}},spark:[15,18,25,35,48,62,80]},
+      {name:"Grid & Storage",sub:"T&D, Battery",mktcap:"$380B",pe:"24.4x",data:{price:{ytd:"+11.2%",y1:"+32.4%",y3:"+88.6%"},eps:{ytd:"+9.8%",y1:"+24.2%",y3:"+56.4%"},pe:{ytd:"+2.2x",y1:"+5.4x",y3:"+10.8x"},ev:{ytd:"+1.4x",y1:"+3.8x",y3:"+7.2x"}},spark:[22,28,36,45,58,68,82]},
+      {name:"EV",sub:"Electric Vehicles",mktcap:"$780B",pe:"34.2x",data:{price:{ytd:"+5.8%",y1:"+18.4%",y3:"+124.2%"},eps:{ytd:"+14.2%",y1:"+32.4%",y3:"+112.8%"},pe:{ytd:"+2.8x",y1:"+6.4x",y3:"+18.4x"},ev:{ytd:"+1.8x",y1:"+4.2x",y3:"+12.4x"}},spark:[18,22,28,38,52,66,82]},
+      {name:"Power Semis",sub:"Power Electronics",mktcap:"$420B",pe:"28.6x",data:{price:{ytd:"+9.2%",y1:"+28.4%",y3:"+96.4%"},eps:{ytd:"+11.4%",y1:"+24.8%",y3:"+72.4%"},pe:{ytd:"+2.4x",y1:"+5.2x",y3:"+14.8x"},ev:{ytd:"+1.6x",y1:"+3.6x",y3:"+9.8x"}},spark:[20,24,32,44,58,72,88]},
+    ],
+    signals: [
+      {time:"14:18\nToday",icon:"alr",iconLabel:"⚡",head:"ERCOT issues conservation appeal as winter storm raises Texas demand above 75 GW threshold",tags:[{t:"Texas",c:"geo"},{t:"Grid",c:"sec"},{t:"ERCOT",c:"co"}],imp:"h",type:"alr"},
+      {time:"12:45\nToday",icon:"pol",iconLabel:"⚖️",head:"European Commission proposes Grid Action Plan revision targeting 100 GW of new interconnection capacity by 2030",tags:[{t:"EU",c:"geo"},{t:"Policy",c:"pol"}],imp:"m",type:"pol"},
+      {time:"11:02\nToday",icon:"deal",iconLabel:"💰",head:"NextEra Energy acquires 2.4 GW US offshore wind development rights from Dominion for $1.1B",tags:[{t:"USA",c:"geo"},{t:"Wind",c:"sec"}],imp:"m",type:"deal"},
+      {time:"08:30\nToday",icon:"mkt",iconLabel:"📊",head:"TTF natural gas futures slide to 3-month low as mild forecast reduces heating demand across Central Europe",tags:[{t:"Europe",c:"geo"},{t:"Gas",c:"sec"}],imp:"l",type:"mkt"},
+      {time:"Yesterday\n18:44",icon:"inf",iconLabel:"🏗️",head:"Canada's Trans Mountain Pipeline expansion achieves full commercial operations, adding 590k bbl/day capacity",tags:[{t:"Canada",c:"geo"},{t:"Oil",c:"sec"}],imp:"m",type:"inf"},
+    ],
+    commentary: [
+      {time:"13:40\nToday",icon:"com",iconLabel:"🏛️",speaker:"Willie Phillips",role:"FERC Chairman",head:"\"The interconnection queue backlog now exceeds 2,600 GW. Our rule finalised last month will clear this within four years.\"",tags:[{t:"FERC",c:"pol"},{t:"Grid",c:"sec"}],type:"ferc"},
+      {time:"11:30\nToday",icon:"com",iconLabel:"⚡",speaker:"Manu Asthana",role:"PJM CEO",head:"\"PJM expects peak summer demand to reach 154 GW in 2026, up from 148 GW last year, driven primarily by data centre load growth in Northern Virginia.\"",tags:[{t:"PJM",c:"pol"},{t:"Demand",c:"sec"}],type:"pjm"},
+      {time:"09:45\nToday",icon:"com",iconLabel:"🌍",speaker:"Fatih Birol",role:"IEA Executive Director",head:"\"Global clean energy investment is on track to exceed $2 trillion in 2026. Grid infrastructure is the critical bottleneck.\"",tags:[{t:"IEA",c:"pol"},{t:"Global",c:"geo"}],type:"iea"},
+      {time:"Yesterday\n16:20",icon:"com",iconLabel:"🏛️",speaker:"Jennifer Granholm",role:"US Secretary of Energy",head:"\"The administration will propose a federal transmission siting authority for interstate lines of national significance.\"",tags:[{t:"US Gov",c:"pol"},{t:"Grid",c:"sec"}],type:"gov"},
+    ],
+  };
+}
+</script>
+</body>
+</html>

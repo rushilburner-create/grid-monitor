@@ -1,0 +1,5 @@
+{
+  "alpha_vantage_key": "YOUR_AV_KEY_HERE",
+  "eia_key": "YOUR_EIA_KEY_HERE",
+  "refresh_interval_minutes": 15
+}
