@@ -1,5 +1,5 @@
 {
-  "last_updated": "28 Feb 2026 \u00b7 11:53 UTC",
+  "last_updated": "28 Feb 2026 \u00b7 13:48 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -71,61 +71,62 @@
   "grid": [
     {
       "name": "ERCOT (Texas)",
-      "demand": 42.4,
+      "demand": 43.6,
       "peak": 76.2,
-      "supply": 44.1,
+      "supply": 45.4,
       "status": "surplus",
       "sources": {
-        "BAT": "1%",
-        "Coal": "14%",
-        "Gas": "36%",
+        "Coal": "11%",
+        "Gas": "31%",
         "Nuclear": "9%",
-        "Wind": "29%"
+        "Wind": "39%"
       },
       "drivers": []
     },
     {
       "name": "PJM (NE US)",
-      "demand": 90.1,
+      "demand": 94.9,
       "peak": 168.2,
-      "supply": 93.7,
+      "supply": 98.7,
       "status": "surplus",
       "sources": {
-        "Coal": "11%",
-        "Gas": "30%",
-        "Nuclear": "18%",
-        "Other": "1%",
+        "Coal": "9%",
+        "Gas": "28%",
+        "Nuclear": "20%",
+        "Other": "2%",
         "Hydro": "1%",
-        "Wind": "1%"
+        "Wind": "5%"
       },
       "drivers": []
     },
     {
       "name": "MISO (Midwest)",
-      "demand": 64.0,
+      "demand": 69.0,
       "peak": 120.0,
-      "supply": 66.6,
+      "supply": 71.7,
       "status": "surplus",
       "sources": {
-        "Coal": "25%",
-        "Gas": "31%",
-        "Nuclear": "10%",
+        "Coal": "19%",
+        "Gas": "24%",
+        "Nuclear": "11%",
         "Hydro": "1%",
-        "Wind": "10%"
+        "Wind": "27%"
       },
       "drivers": []
     },
     {
       "name": "CAISO (California)",
-      "demand": 24.5,
+      "demand": 23.4,
       "peak": 52.0,
-      "supply": 25.5,
+      "supply": 24.4,
       "status": "surplus",
       "sources": {
-        "GEO": "10%",
-        "Gas": "44%",
-        "Nuclear": "20%",
-        "Other": "27%"
+        "BAT": "1%",
+        "GEO": "8%",
+        "Gas": "52%",
+        "Nuclear": "16%",
+        "Other": "23%",
+        "SNB": "1%"
       },
       "drivers": []
     },
