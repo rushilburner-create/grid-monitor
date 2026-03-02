@@ -1,5 +1,5 @@
 {
-  "last_updated": "02 Mar 2026 \u00b7 21:06 UTC",
+  "last_updated": "02 Mar 2026 \u00b7 22:02 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -76,11 +76,7 @@
       "supply": 0,
       "status": "surplus",
       "sources": {
-        "BAT": "1%",
-        "Coal": "12%",
-        "Gas": "28%",
-        "Nuclear": "9%",
-        "Wind": "38%"
+        "Gas": "N/A"
       },
       "drivers": []
     },
@@ -91,20 +87,15 @@
       "supply": 0,
       "status": "surplus",
       "sources": {
-        "Coal": "10%",
-        "Gas": "29%",
-        "Nuclear": "18%",
-        "Other": "1%",
-        "Hydro": "1%",
-        "Wind": "2%"
+        "Gas": "N/A"
       },
       "drivers": []
     },
     {
       "name": "MISO (Midwest)",
-      "demand": 0,
+      "demand": 78.7,
       "peak": 120.0,
-      "supply": 0,
+      "supply": 81.9,
       "status": "surplus",
       "sources": {
         "Gas": "N/A"
