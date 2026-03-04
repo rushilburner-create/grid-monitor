@@ -1,5 +1,5 @@
 {
-  "last_updated": "04 Mar 2026 \u00b7 11:57 UTC",
+  "last_updated": "04 Mar 2026 \u00b7 14:10 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -71,62 +71,62 @@
   "grid": [
     {
       "name": "ERCOT (Texas)",
-      "demand": 49.3,
+      "demand": 47.8,
       "peak": 76.2,
-      "supply": 51.2,
+      "supply": 49.7,
       "status": "surplus",
       "sources": {
-        "BAT": "1%",
         "Coal": "12%",
-        "Gas": "30%",
-        "Nuclear": "6%",
-        "Wind": "41%"
+        "Gas": "29%",
+        "Nuclear": "8%",
+        "Wind": "45%"
       },
       "drivers": []
     },
     {
       "name": "PJM (NE US)",
-      "demand": 91.6,
+      "demand": 100.8,
       "peak": 168.2,
-      "supply": 95.3,
+      "supply": 104.8,
       "status": "surplus",
       "sources": {
         "Coal": "10%",
-        "Gas": "29%",
+        "Gas": "30%",
         "Nuclear": "17%",
         "Oil": "1%",
         "Other": "2%",
+        "Hydro": "1%",
+        "Wind": "2%"
+      },
+      "drivers": []
+    },
+    {
+      "name": "MISO (Midwest)",
+      "demand": 75.2,
+      "peak": 120.0,
+      "supply": 78.2,
+      "status": "surplus",
+      "sources": {
+        "Coal": "25%",
+        "Gas": "35%",
+        "Nuclear": "10%",
         "Hydro": "1%",
         "Wind": "3%"
       },
       "drivers": []
     },
     {
-      "name": "MISO (Midwest)",
-      "demand": 66.0,
-      "peak": 120.0,
-      "supply": 68.6,
-      "status": "surplus",
-      "sources": {
-        "Coal": "23%",
-        "Gas": "30%",
-        "Nuclear": "10%",
-        "Hydro": "1%",
-        "Wind": "15%"
-      },
-      "drivers": []
-    },
-    {
       "name": "CAISO (California)",
-      "demand": 24.0,
+      "demand": 23.7,
       "peak": 52.0,
-      "supply": 25.0,
+      "supply": 24.7,
       "status": "surplus",
       "sources": {
-        "GEO": "10%",
-        "Gas": "40%",
-        "Nuclear": "21%",
-        "Other": "29%"
+        "GEO": "9%",
+        "Gas": "54%",
+        "Nuclear": "18%",
+        "Other": "17%",
+        "PS": "1%"
       },
       "drivers": []
     },
