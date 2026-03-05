@@ -1,5 +1,5 @@
 {
-  "last_updated": "05 Mar 2026 \u00b7 05:04 UTC",
+  "last_updated": "05 Mar 2026 \u00b7 07:32 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -71,9 +71,9 @@
   "grid": [
     {
       "name": "ERCOT (Texas)",
-      "demand": 53.1,
+      "demand": 48.0,
       "peak": 76.2,
-      "supply": 55.2,
+      "supply": 49.9,
       "status": "surplus",
       "sources": {
         "Coal": "12%",
@@ -85,9 +85,9 @@
     },
     {
       "name": "PJM (NE US)",
-      "demand": 91.5,
+      "demand": 86.4,
       "peak": 168.2,
-      "supply": 95.1,
+      "supply": 89.8,
       "status": "surplus",
       "sources": {
         "Coal": "10%",
@@ -102,9 +102,9 @@
     },
     {
       "name": "MISO (Midwest)",
-      "demand": 73.3,
+      "demand": 70.5,
       "peak": 120.0,
-      "supply": 76.2,
+      "supply": 73.4,
       "status": "surplus",
       "sources": {
         "Coal": "25%",
@@ -117,9 +117,9 @@
     },
     {
       "name": "CAISO (California)",
-      "demand": 30.0,
+      "demand": 28.3,
       "peak": 52.0,
-      "supply": 31.2,
+      "supply": 29.5,
       "status": "surplus",
       "sources": {
         "GEO": "9%",
