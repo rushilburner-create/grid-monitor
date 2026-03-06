@@ -1,5 +1,5 @@
 {
-  "last_updated": "06 Mar 2026 \u00b7 11:02 UTC",
+  "last_updated": "06 Mar 2026 \u00b7 11:57 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -76,15 +76,19 @@
       "supply": 50.5,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "BAT": "3%",
+        "Coal": "13%",
+        "Gas": "42%",
+        "Nuclear": "8%",
+        "Wind": "19%"
       },
       "drivers": []
     },
     {
       "name": "PJM (NE US)",
-      "demand": 81.9,
+      "demand": 84.5,
       "peak": 168.2,
-      "supply": 85.1,
+      "supply": 87.8,
       "status": "surplus",
       "sources": {
         "Coal": "10%",
@@ -98,9 +102,9 @@
     },
     {
       "name": "MISO (Midwest)",
-      "demand": 63.7,
+      "demand": 63.8,
       "peak": 120.0,
-      "supply": 66.2,
+      "supply": 66.3,
       "status": "surplus",
       "sources": {
         "Coal": "25%",
