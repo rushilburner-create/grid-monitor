@@ -1,5 +1,5 @@
 {
-  "last_updated": "07 Mar 2026 \u00b7 15:59 UTC",
+  "last_updated": "07 Mar 2026 \u00b7 16:54 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -71,12 +71,16 @@
   "grid": [
     {
       "name": "ERCOT (Texas)",
-      "demand": 0,
+      "demand": 49.9,
       "peak": 76.2,
-      "supply": 0,
+      "supply": 51.9,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "BAT": "2%",
+        "Coal": "12%",
+        "Gas": "31%",
+        "Nuclear": "8%",
+        "Wind": "33%"
       },
       "drivers": []
     },
@@ -87,7 +91,12 @@
       "supply": 0,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "Coal": "8%",
+        "Gas": "29%",
+        "Nuclear": "20%",
+        "Other": "1%",
+        "Hydro": "1%",
+        "Wind": "5%"
       },
       "drivers": []
     },
@@ -98,18 +107,25 @@
       "supply": 0,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "Coal": "22%",
+        "Gas": "26%",
+        "Nuclear": "10%",
+        "Hydro": "1%",
+        "Wind": "20%"
       },
       "drivers": []
     },
     {
       "name": "CAISO (California)",
-      "demand": 0,
+      "demand": 24.6,
       "peak": 52.0,
-      "supply": 0,
+      "supply": 25.6,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "GEO": "11%",
+        "Gas": "38%",
+        "Nuclear": "21%",
+        "Other": "30%"
       },
       "drivers": []
     },
