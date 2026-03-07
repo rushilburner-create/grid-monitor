@@ -1,5 +1,5 @@
 {
-  "last_updated": "07 Mar 2026 \u00b7 11:55 UTC",
+  "last_updated": "07 Mar 2026 \u00b7 13:50 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -82,12 +82,17 @@
     },
     {
       "name": "PJM (NE US)",
-      "demand": 0,
+      "demand": 83.5,
       "peak": 168.2,
-      "supply": 0,
+      "supply": 86.8,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "Coal": "8%",
+        "Gas": "29%",
+        "Nuclear": "20%",
+        "Other": "1%",
+        "Hydro": "1%",
+        "Wind": "5%"
       },
       "drivers": []
     },
