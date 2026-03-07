@@ -1,5 +1,5 @@
 {
-  "last_updated": "07 Mar 2026 \u00b7 20:50 UTC",
+  "last_updated": "07 Mar 2026 \u00b7 21:39 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -76,7 +76,11 @@
       "supply": 56.2,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "BAT": "2%",
+        "Coal": "12%",
+        "Gas": "31%",
+        "Nuclear": "8%",
+        "Wind": "33%"
       },
       "drivers": []
     },
