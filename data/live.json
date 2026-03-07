@@ -1,5 +1,5 @@
 {
-  "last_updated": "07 Mar 2026 \u00b7 07:59 UTC",
+  "last_updated": "07 Mar 2026 \u00b7 08:59 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -71,9 +71,9 @@
   "grid": [
     {
       "name": "ERCOT (Texas)",
-      "demand": 0,
+      "demand": 49.5,
       "peak": 76.2,
-      "supply": 0,
+      "supply": 51.5,
       "status": "surplus",
       "sources": {
         "Gas": "N/A"
@@ -82,9 +82,9 @@
     },
     {
       "name": "PJM (NE US)",
-      "demand": 81.5,
+      "demand": 0,
       "peak": 168.2,
-      "supply": 84.8,
+      "supply": 0,
       "status": "surplus",
       "sources": {
         "Gas": "N/A"
