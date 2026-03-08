@@ -1,5 +1,5 @@
 {
-  "last_updated": "08 Mar 2026 \u00b7 07:09 UTC",
+  "last_updated": "08 Mar 2026 \u00b7 07:53 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -117,9 +117,9 @@
     },
     {
       "name": "CAISO (California)",
-      "demand": 26.5,
+      "demand": 26.9,
       "peak": 52.0,
-      "supply": 27.5,
+      "supply": 28.0,
       "status": "surplus",
       "sources": {
         "GEO": "11%",
