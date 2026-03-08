@@ -1,5 +1,5 @@
 {
-  "last_updated": "08 Mar 2026 \u00b7 20:52 UTC",
+  "last_updated": "08 Mar 2026 \u00b7 21:43 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -102,9 +102,9 @@
     },
     {
       "name": "MISO (Midwest)",
-      "demand": 65.7,
+      "demand": 65.5,
       "peak": 120.0,
-      "supply": 68.3,
+      "supply": 68.1,
       "status": "surplus",
       "sources": {
         "Coal": "20%",
