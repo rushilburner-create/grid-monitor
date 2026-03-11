@@ -1,5 +1,5 @@
 {
-  "last_updated": "11 Mar 2026 \u00b7 10:03 UTC",
+  "last_updated": "11 Mar 2026 \u00b7 11:49 UTC",
   "prices": [
     {
       "name": "Brent Crude",
@@ -71,9 +71,9 @@
   "grid": [
     {
       "name": "ERCOT (Texas)",
-      "demand": 0,
+      "demand": 45.5,
       "peak": 76.2,
-      "supply": 0,
+      "supply": 47.3,
       "status": "surplus",
       "sources": {
         "Gas": "N/A"
@@ -82,9 +82,9 @@
     },
     {
       "name": "PJM (NE US)",
-      "demand": 0,
+      "demand": 82.6,
       "peak": 168.2,
-      "supply": 0,
+      "supply": 86.0,
       "status": "surplus",
       "sources": {
         "Gas": "N/A"
@@ -93,23 +93,31 @@
     },
     {
       "name": "MISO (Midwest)",
-      "demand": 0,
+      "demand": 66.1,
       "peak": 120.0,
-      "supply": 0,
+      "supply": 68.8,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "Coal": "20%",
+        "Gas": "28%",
+        "Nuclear": "11%",
+        "Hydro": "1%",
+        "Wind": "21%"
       },
       "drivers": []
     },
     {
       "name": "CAISO (California)",
-      "demand": 0,
+      "demand": 22.8,
       "peak": 52.0,
-      "supply": 0,
+      "supply": 23.7,
       "status": "surplus",
       "sources": {
-        "Gas": "N/A"
+        "GEO": "10%",
+        "Gas": "31%",
+        "Nuclear": "22%",
+        "Other": "36%",
+        "SNB": "1%"
       },
       "drivers": []
     },
